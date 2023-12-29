@@ -133,7 +133,7 @@ function fetchPreMenu(sessionId, weekday) {
             reject(desc)
           } else {
             if (data.length > 1) {
-              $notification.post(`刷新菜单${date}`, `${date} 菜单已更新，可下单`)
+              $notification.post(`刷新菜单${date}`, `${date}(下周${weekday})菜单已更新，可下单`)
               storeValue(key, '1')
             } else {
               console.log(`${date} 菜单未更新!!!!`);
