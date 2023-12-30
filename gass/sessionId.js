@@ -254,7 +254,7 @@ function fetchGoods() {
         .then(([res1]) => {
           $notification.post(
             'Goods',
-            `数量：${res1.length}，${res1[0].goodsName}`,
+            `数量：${res1.length}`,
             `工作日：${readValue(GLOBAL_VALUES.WORK_DAYS_KEY)}`,
           )
         })
