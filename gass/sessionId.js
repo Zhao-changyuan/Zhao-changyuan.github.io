@@ -242,7 +242,7 @@ function fetchGoods() {
   } else {
     const sessionId = readValue(GLOBAL_VALUES.SESSION_ID_KEY)
     if (sessionId) {
-      storeValue(GLOBAL_VALUES.WORK_DAYS_KEY, '')
+      storeValue(GLOBAL_VALUES.SESSION_ID_DATE_KEY, '')
 
       const workdays = getNextWeekWorkdays()
       storeValue(GLOBAL_VALUES.WORK_DAYS_KEY, JSON.stringify(workdays))
