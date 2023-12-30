@@ -246,6 +246,9 @@ function fetchGoods() {
 
       const workdays = getNextWeekWorkdays()
       storeValue(GLOBAL_VALUES.WORK_DAYS_KEY, JSON.stringify(workdays))
+      workdays.forEach((item) => {
+        storeValue(item.key, '')
+      })
 
       Promise.all([fetchGoods()])
         .then(([res1]) => {
