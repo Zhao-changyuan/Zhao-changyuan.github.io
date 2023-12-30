@@ -101,6 +101,8 @@ function getNextWeekWorkdays() {
       }
     }
   }
+
+  return arr
 }
 
 
