@@ -1,3 +1,67 @@
+// 登录接口
+const LOGIN_URL = 'https://wgzx.gass.cn/wxopen/OnLogin'
+
+// 全局变量
+const GLOBAL_VALUES = {
+  SESSION_ID_KEY: 'gassSessionId',
+  SESSION_ID_DATE_KEY: 'gassSessionIdDate',
+  GOODS: 'gassGoods',
+  WORK_DAYS_KEY: 'gassWorkDays',
+}
+
+// 2024年日期为周一至周五的，但是是节假日的，字符串数组，日期格式为：yyyymmdd
+const holiday = [
+  // 元旦
+  '20240101',
+  // 春节
+  '20240210',
+  '20240211',
+  '20240212',
+  '20240213',
+  '20240214',
+  '20240215',
+  '20240216',
+  '20240217',
+  // 清明节
+  '20240404',
+  '20240405',
+  '20240406',
+  // 劳动节
+  '20240501',
+  '20240502',
+  '20240503',
+  '20240504',
+  '20240505',
+  // 端午节
+  '20240608',
+  '20240609',
+  '20240610',
+  // 中秋节
+  '20240915',
+  '20240916',
+  '20240917',
+  // 国庆节
+  '20241001',
+  '20241002',
+  '20241003',
+  '20241004',
+  '20241005',
+  '20241006',
+  '20241007',
+]
+
+// 调休工作日
+const specialWeekdays = [
+  '20230204',
+  '20230218',
+  '20230407',
+  '20230428',
+  '20230511',
+  '20230914',
+  '20230929',
+  '20231012',
+]
+
 /**
  * 获取下周的某个日期，参数为下周几的一个数字，1-7
  * @param {number} weekday 1-7
@@ -15,8 +79,31 @@ function getNextWeekday(weekday) {
   return {
     key: `menu${dateStr}`,
     date: dateStr,
+    no: weekday,
   }
 }
+
+/**
+ * 获取下周的工作日
+  * @returns {Array<{key: string, date: string}>}
+ */
+function getNextWeekWorkdays() {
+  const arr = []
+  for (let i = 1; i <= 7; i++) {
+    const cur = getNextWeekday(i)
+    if (i <= 5) {
+      if (!holiday.includes(cur.date)) {
+        arr.push(cur)
+      }
+    } else {
+      if (specialWeekdays.includes(cur.date)) {
+        arr.push(cur)
+      }
+    }
+  }
+}
+
+
 
 // 获取今日日期，格式为 20231229
 function getToday() {
@@ -92,7 +179,6 @@ function fetchOrderQueryAcc(sessionId) {
         if (err) {
           reject(err)
         } else {
-          // console.log('fetchOrderQueryAcc res:', body)
           resolve(body)
         }
       }
@@ -100,14 +186,30 @@ function fetchOrderQueryAcc(sessionId) {
   })
 }
 
-// 登录接口
-const LOGIN_URL = 'https://wgzx.gass.cn/wxopen/OnLogin'
-
-// 全局变量
-const GLOBAL_VALUES = {
-  SESSION_ID_KEY: 'gassSessionId',
-  SESSION_ID_DATE_KEY: 'gassSessionIdDate',
+function fetchGoods() {
+  return new Promise((resolve, reject) => {
+    $httpClient.post(
+      {
+        url: `https://wgzx.gass.cn:18085/order/FetchGoods`,
+        headers: {
+          Accept: 'application/json, text/plain, */*',
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      },
+      (err, response, body) => {
+        if (err) {
+          reject(err)
+        } else {
+          const res = JSON.parse(body)
+          storeValue(GLOBAL_VALUES.GOODS, JSON.stringify(res.data))
+          resolve(res.data)
+        }
+      }
+    )
+  })
 }
+
+
 
 ;(() => {
   const url = $request.url
@@ -127,15 +229,10 @@ const GLOBAL_VALUES = {
       storeValue(GLOBAL_VALUES.SESSION_ID_DATE_KEY, today)
       $notification.post(`${today} SessionId 更新`, sessionId)
 
-      // 清空菜单状态
-      storeValue(getNextWeekday(1).key, '0')
-      storeValue(getNextWeekday(2).key, '0')
-      storeValue(getNextWeekday(3).key, '0')
-      storeValue(getNextWeekday(4).key, '0')
-      storeValue(getNextWeekday(5).key, '0')
+      const workdays = getNextWeekWorkdays()
+      storeValue(GLOBAL_VALUES.WORK_DAYS_KEY, JSON.stringify(workdays))
 
-      Promise.all([fetchIndex(sessionId), fetchOrderQueryAcc(sessionId)])
-        .then(([res1, res2]) => {})
+      Promise.all([fetchIndex(sessionId), fetchOrderQueryAcc(sessionId), fetchGoods()])
         .finally(() => {
           $done({})
         })
@@ -143,14 +240,14 @@ const GLOBAL_VALUES = {
   } else {
     const sessionId = readValue(GLOBAL_VALUES.SESSION_ID_KEY)
     if (sessionId) {
-      Promise.all([fetchIndex(sessionId), fetchOrderQueryAcc(sessionId)])
-        .then(([res1, res2]) => {
+      const workdays = getNextWeekWorkdays()
+      storeValue(GLOBAL_VALUES.WORK_DAYS_KEY, JSON.stringify(workdays))
+
+      Promise.all([fetchGoods()])
+        .then(([res1]) => {
           $notification.post(
-            '刷新账户信息',
-            '',
-            `${GLOBAL_VALUES.SESSION_ID_DATE_KEY}: ${readValue(GLOBAL_VALUES.SESSION_ID_DATE_KEY)}，${
-              GLOBAL_VALUES.SESSION_ID_KEY
-            }: ${sessionId}，账户信息：${res2}`
+            'Goods',
+            `数量：${res1.length}，${res1[0].goodsName}，工作日：${readValue(GLOBAL_VALUES.WORK_DAYS_KEY)}}`,
           )
         })
         .finally(() => {

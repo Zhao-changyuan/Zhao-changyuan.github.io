@@ -1,65 +1,9 @@
-// 2024年日期为周一至周五的，但是是节假日的，字符串数组，日期格式为：yyyymmdd
-const holiday = [
-  // 元旦
-  '20240101',
-  // 春节
-  '20240210',
-  '20240211',
-  '20240212',
-  '20240213',
-  '20240214',
-  '20240215',
-  '20240216',
-  '20240217',
-  // 清明节
-  '20240404',
-  '20240405',
-  '20240406',
-  // 劳动节
-  '20240501',
-  '20240502',
-  '20240503',
-  '20240504',
-  '20240505',
-  // 端午节
-  '20240608',
-  '20240609',
-  '20240610',
-  // 中秋节
-  '20240915',
-  '20240916',
-  '20240917',
-  // 国庆节
-  '20241001',
-  '20241002',
-  '20241003',
-  '20241004',
-  '20241005',
-  '20241006',
-  '20241007',
-]
-  
-  
-
-
-/**
- * 获取下周的某个日期，参数为下周几的一个数字，1-7
- * @param {number} weekday 1-7
- * @returns
- */
-function getNextWeekday(weekday) {
-  const date = new Date()
-  const day = date.getDay()
-  const nextWeekday = new Date(date.getTime() + (7 - day + weekday) * 24 * 60 * 60 * 1000)
-  const month = `${nextWeekday.getMonth() + 1}`.padStart(2, '0')
-  const dayOfMonth = `${nextWeekday.getDate()}`.padStart(2, '0')
-
-  const dateStr = `${nextWeekday.getFullYear()}${month}${dayOfMonth}`
-
-  return {
-    key: `menu${dateStr}`,
-    date: dateStr,
-  }
+// 全局变量
+const GLOBAL_VALUES = {
+  SESSION_ID_KEY: 'gassSessionId',
+  SESSION_ID_DATE_KEY: 'gassSessionIdDate',
+  GOODS: 'gassGoods',
+  WORK_DAYS_KEY: 'gassWorkDays',
 }
 
 /**
@@ -90,22 +34,29 @@ function getSessionId() {
 }
 
 /**
+ * 获取所有商品
+ * @returns 
+ */
+function getGoods() {
+  const str = readValue(GLOBAL_VALUES.GOODS)
+  if (!str) {
+    return []
+  }
+
+  return JSON.parse(str)
+}
+
+/**
  * 获取菜单
  * @param {string} sessionId
  * @param {number} weekday 1-7
  * @returns
  */
 function fetchPreMenu(sessionId, weekday) {
-  const { key, date } = getNextWeekday(weekday)
+  const { key, date, no } = weekday
   return new Promise((resolve, reject) => {
-    if (holiday.includes(date)) {
-      console.log(`${date} 为节假日，不刷新菜单`);
-      resolve(`${date} 为节假日，不刷新菜单！`)
-      return
-    }
-
     const status = readValue(key)
-    console.log(`${key}:`, status);
+    console.log(`${key}:`, status)
     if (+status === 1) {
       resolve(status)
       return
@@ -129,14 +80,22 @@ function fetchPreMenu(sessionId, weekday) {
           const { retcode, desc, data } = res
 
           if (retcode !== 0) {
-            console.log(`${date}, desc: ${desc}!!!`);
+            console.log(`${date}, desc: ${desc}!!!`)
             reject(desc)
           } else {
             if (data.length > 1) {
-              $notification.post(`刷新菜单${date}`, `${date}(下周${weekday})菜单已更新，可下单`)
+              const goods = getGoods()
+              const data1 = data.slice(1)
+              const menuStr = data1.map((item) => {
+                const { goodsNo } = item
+                const good = goods.find((good) => good.goodsNo === goodsNo)
+                return good.goodsName
+              }).join(',')
+
+              $notification.post(`刷新菜单${date}`, `${date}(下周${no})菜单:${menuStr}`)
               storeValue(key, '1')
             } else {
-              console.log(`${date} 菜单未更新!!!!`);
+              console.log(`${date} 菜单未更新!!!!`)
             }
 
             resolve(data)
@@ -147,12 +106,6 @@ function fetchPreMenu(sessionId, weekday) {
   })
 }
 
-// 全局变量
-const GLOBAL_VALUES = {
-  SESSION_ID_KEY: 'gassSessionId',
-  SESSION_ID_DATE_KEY: 'gassSessionIdDate',
-}
-
 ;(() => {
   const sessionId = getSessionId()
   const sessionIdDate = readValue(GLOBAL_VALUES.SESSION_ID_DATE_KEY)
@@ -161,18 +114,27 @@ const GLOBAL_VALUES = {
   if (!sessionId) {
     $notification.post('刷新菜单', '未获取到sessionId，请登录小程序')
     $done({})
-    return;
+    return
   } else {
-    Promise.all([fetchPreMenu(sessionId, 1), fetchPreMenu(sessionId, 2), fetchPreMenu(sessionId, 3), fetchPreMenu(sessionId, 4), fetchPreMenu(sessionId, 5)])
-      .then((res) => {
-        console.log('weekdayData:', res)
-      })
-      .catch((error) => {
-        console.error(error)
-        $notification.post('刷新菜单失败', error)
-      })
-      .finally(() => {
-        $done({})
-      })
+    const workdaysStr = readValue(GLOBAL_VALUES.WORK_DAYS_KEY)
+    if (!workdaysStr) {
+      $notification.post('刷新菜单失败', '未获取到工作日，请登录小程序')
+      $done({})
+      return
+    } else {
+      const workdays = JSON.parse(workdaysStr)
+
+      Promise.all([workdays.forEach((weekday) => fetchPreMenu(sessionId, weekday))])
+        .then((res) => {
+          console.log('weekdayData:', res)
+        })
+        .catch((error) => {
+          console.error(error)
+          $notification.post('刷新菜单失败', error)
+        })
+        .finally(() => {
+          $done({})
+        })
+    }
   }
 })()
