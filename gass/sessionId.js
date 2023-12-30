@@ -1,4 +1,4 @@
-// 登录接口
+// 登录接口 test
 const LOGIN_URL = 'https://wgzx.gass.cn/wxopen/OnLogin'
 
 // 全局变量
