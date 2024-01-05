@@ -237,23 +237,16 @@ function fetchGoods() {
         })
     }
   } else {
-    const sessionId = readValue(GLOBAL_VALUES.SESSION_ID_KEY)
-    if (sessionId) {
-      // storeValue(GLOBAL_VALUES.SESSION_ID_DATE_KEY, '')
-
-      // const workdays = getNextWeekWorkdays()
-      // storeValue(GLOBAL_VALUES.WORK_DAYS_KEY, JSON.stringify(workdays))
-      // workdays.forEach((item) => {
-      //   storeValue(item.key, '')
-      // })
-
-      Promise.all([fetchGoods()])
-        .then(([res1]) => {
-          $notification.post('Goods', `数量：${res1.length}`, `工作日：${readValue(GLOBAL_VALUES.WORK_DAYS_KEY)}，sessionIdDate: ${readValue(GLOBAL_VALUES.SESSION_ID_DATE_KEY)}, today: ${getToday()}`)
-        })
-        .finally(() => {
-          $done({})
-        })
-    }
+    $done({})
+    // const sessionId = readValue(GLOBAL_VALUES.SESSION_ID_KEY)
+    // if (sessionId) {
+    //   Promise.all([fetchGoods()])
+    //     .then(([res1]) => {
+    //       $notification.post('Goods', `数量：${res1.length}`, `工作日：${readValue(GLOBAL_VALUES.WORK_DAYS_KEY)}，sessionIdDate: ${readValue(GLOBAL_VALUES.SESSION_ID_DATE_KEY)}, today: ${getToday()}`)
+    //     })
+    //     .finally(() => {
+    //       $done({})
+    //     })
+    // }
   }
 })()
