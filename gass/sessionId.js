@@ -51,16 +51,7 @@ const holiday = [
 ]
 
 // 调休工作日
-const specialWeekdays = [
-  '20230204',
-  '20230218',
-  '20230407',
-  '20230428',
-  '20230511',
-  '20230914',
-  '20230929',
-  '20231012',
-]
+const specialWeekdays = ['20230204', '20230218', '20230407', '20230428', '20230511', '20230914', '20230929', '20231012']
 
 /**
  * 获取下周的某个日期，参数为下周几的一个数字，1-7
@@ -85,7 +76,7 @@ function getNextWeekday(weekday) {
 
 /**
  * 获取下周的工作日
-  * @returns {Array<{key: string, date: string}>}
+ * @returns {Array<{key: string, date: string}>}
  */
 function getNextWeekWorkdays() {
   const arr = []
@@ -104,8 +95,6 @@ function getNextWeekWorkdays() {
 
   return arr
 }
-
-
 
 // 获取今日日期，格式为 20231229
 function getToday() {
@@ -211,8 +200,6 @@ function fetchGoods() {
   })
 }
 
-
-
 ;(() => {
   const url = $request.url
 
@@ -224,9 +211,12 @@ function fetchGoods() {
       const sessionIdDate = readValue(GLOBAL_VALUES.SESSION_ID_DATE_KEY)
       const today = getToday()
       if (sessionIdDate === today) {
-        $done({})
+        Promise.all([fetchGoods()]).finally(() => {
+          $done({})
+        })
         return
       }
+
       storeValue(GLOBAL_VALUES.SESSION_ID_KEY, sessionId)
       storeValue(GLOBAL_VALUES.SESSION_ID_DATE_KEY, today)
       $notification.post(`${today} SessionId 更新`, sessionId)
@@ -235,34 +225,14 @@ function fetchGoods() {
       storeValue(GLOBAL_VALUES.WORK_DAYS_KEY, JSON.stringify(workdays))
 
       Promise.all([fetchIndex(sessionId), fetchOrderQueryAcc(sessionId), fetchGoods()])
+        .then(([res1, res2, res3]) => {
+          $notification.post('Goods', `数量：${res3.length}`, `工作日：${readValue(GLOBAL_VALUES.WORK_DAYS_KEY)}`)
+        })
         .finally(() => {
           $done({})
         })
     }
   } else {
-    const sessionId = readValue(GLOBAL_VALUES.SESSION_ID_KEY)
-    if (sessionId) {
-      storeValue(GLOBAL_VALUES.SESSION_ID_DATE_KEY, '')
-
-      const workdays = getNextWeekWorkdays()
-      storeValue(GLOBAL_VALUES.WORK_DAYS_KEY, JSON.stringify(workdays))
-      workdays.forEach((item) => {
-        storeValue(item.key, '')
-      })
-
-      Promise.all([fetchGoods()])
-        .then(([res1]) => {
-          $notification.post(
-            'Goods',
-            `数量：${res1.length}`,
-            `工作日：${readValue(GLOBAL_VALUES.WORK_DAYS_KEY)}`,
-          )
-        })
-        .finally(() => {
-          $done({})
-        })
-    } else {
-      $done({})
-    }
+    $done({})
   }
 })()
