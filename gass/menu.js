@@ -57,7 +57,7 @@ function fetchPreMenu(sessionId, weekday) {
   return new Promise((resolve, reject) => {
     const status = readValue(key)
     console.log(`${key}:`, status)
-    if (+status === 1) {
+    if (+status >= 2) {
       resolve(status)
       return
     }
@@ -93,7 +93,7 @@ function fetchPreMenu(sessionId, weekday) {
               }).join(',')
 
               $notification.post(`${date}(下周${no})菜单 王子请下单`, menuStr, menuStr)
-              storeValue(key, '1')
+              storeValue(key, `${data1.length}`)
             } else {
               console.log(`${date} 菜单未更新!!!!`)
             }
