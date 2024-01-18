@@ -230,7 +230,7 @@ function fetchGoods() {
 
       Promise.all([fetchIndex(sessionId), fetchOrderQueryAcc(sessionId), fetchGoods()])
         .then(([res1, res2, res3]) => {
-          $notification.post('Goods', `数量：${res3.length}`, `工作日：${readValue(GLOBAL_VALUES.WORK_DAYS_KEY)}`)
+          $notification.post('Goods', `数量：${res3.length}`, `下周工作日：${readValue(GLOBAL_VALUES.WORK_DAYS_KEY)}`)
         })
         .finally(() => {
           $done({})

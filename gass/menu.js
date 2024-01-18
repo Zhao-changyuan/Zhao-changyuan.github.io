@@ -123,6 +123,16 @@ function fetchPreMenu(sessionId, weekday) {
       return
     } else {
       const workdays = JSON.parse(workdaysStr)
+      
+      if (workdays.every(item => {
+        const { key } = item
+        const goodNum = readValue(key)
+        return +goodNum >= 2
+      })) {
+        console.log('菜单已更新');
+        $done({})
+        return
+      }
 
       Promise.all([workdays.forEach((weekday) => fetchPreMenu(sessionId, weekday))])
         .then((res) => {
