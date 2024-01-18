@@ -134,7 +134,7 @@ function getToday() {
     } else {
       // 仅在本周第一个连续工作区间的最后一个工作日执行
       const curWeekLastWorkday = readValue(GLOBAL_VALUES.CUR_WORK_LAST_WORKDAY)
-      console.log('本周第一个连续工作区间的最后一个工作日为:', curWeekLastWorkday);
+      console.log(`本周第一个连续工作区间的最后一个工作日为:${curWeekLastWorkday}`);
       if (!curWeekLastWorkday || curWeekLastWorkday !== getToday()) {
         console.log('非菜单可能更新日期，跳过！！！');
         $done({})
