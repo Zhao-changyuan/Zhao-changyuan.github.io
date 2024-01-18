@@ -4,6 +4,7 @@ const GLOBAL_VALUES = {
   SESSION_ID_DATE_KEY: 'gassSessionIdDate',
   GOODS: 'gassGoods',
   WORK_DAYS_KEY: 'gassWorkDays',
+  CUR_WORK_LAST_WORKDAY: 'curWeekLastWorkday'
 }
 
 /**
@@ -106,6 +107,15 @@ function fetchPreMenu(sessionId, weekday) {
   })
 }
 
+// 获取今日日期，格式为 20241229
+function getToday() {
+  const date = new Date()
+  const month = `${date.getMonth() + 1}`.padStart(2, '0')
+  const day = `${date.getDate()}`.padStart(2, '0')
+
+  return `${date.getFullYear()}${month}${day}`
+}
+
 ;(() => {
   const sessionId = getSessionId()
   const sessionIdDate = readValue(GLOBAL_VALUES.SESSION_ID_DATE_KEY)
@@ -122,6 +132,16 @@ function fetchPreMenu(sessionId, weekday) {
       $done({})
       return
     } else {
+      // 仅在本周第一个连续工作区间的最后一个工作日执行
+      const curWeekLastWorkday = readValue(GLOBAL_VALUES.CUR_WORK_LAST_WORKDAY)
+      console.log('本周第一个连续工作区间的最后一个工作日为:', curWeekLastWorkday);
+      if (!curWeekLastWorkday || curWeekLastWorkday !== getToday()) {
+        console.log('非菜单可能更新日期，跳过！！！');
+        $done({})
+        return;
+      }
+
+
       const workdays = JSON.parse(workdaysStr)
       
       if (workdays.every(item => {

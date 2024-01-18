@@ -7,6 +7,7 @@ const GLOBAL_VALUES = {
   SESSION_ID_DATE_KEY: 'gassSessionIdDate',
   GOODS: 'gassGoods',
   WORK_DAYS_KEY: 'gassWorkDays',
+  CUR_WORK_LAST_WORKDAY: 'curWeekLastWorkday'
 }
 
 // 2024年日期为周一至周五的，但是是节假日的，字符串数组，日期格式为：yyyymmdd
@@ -51,7 +52,7 @@ const holiday = [
 ]
 
 // 调休工作日
-const specialWeekdays = ['20230204', '20230218', '20230407', '20230428', '20230511', '20230914', '20230929', '20231012']
+const specialWeekdays = ['20240204', '20240218', '20240407', '20240428', '20240511', '20240914', '20240929', '20241012']
 
 // 获取当前周7天的所有日期，格式为：yyyymmdd
 function getCurWeekDays() {
@@ -101,14 +102,15 @@ function getCurWeekLastWorkday() {
   
   for (let i = 0; i < arr.length; i++) {
     const cur = arr[i]
-    if (holiday.includes(cur)) {
+
+    if (holiday.includes(cur) || ((i === 5 || i === 6) && !specialWeekdays.includes(cur))) {
       if (last) {
         break;
       } else {
         continue
       }
     } else {
-      last = cur
+      last = cur;
     }
   }
 
@@ -137,7 +139,7 @@ function getNextWeekWorkdays() {
   return arr
 }
 
-// 获取今日日期，格式为 20231229
+// 获取今日日期，格式为 20241229
 function getToday() {
   const date = new Date()
   const month = `${date.getMonth() + 1}`.padStart(2, '0')
@@ -265,6 +267,10 @@ function fetchGoods() {
       storeValue(GLOBAL_VALUES.SESSION_ID_KEY, sessionId)
       storeValue(GLOBAL_VALUES.SESSION_ID_DATE_KEY, today)
       $notification.post(`${today} SessionId 更新`, sessionId)
+
+      const curWeekLastWorkday = getCurWeekLastWorkday()
+      storeValue(GLOBAL_VALUES.CUR_WORK_LAST_WORKDAY, curWeekLastWorkday || '')
+
 
       const workdays = getNextWeekWorkdays()
       storeValue(GLOBAL_VALUES.WORK_DAYS_KEY, JSON.stringify(workdays))
