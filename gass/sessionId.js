@@ -243,6 +243,13 @@ function fetchGoods() {
   })
 }
 
+// 随机0-360其中的一个数字
+function getRandom() {
+  return Math.floor(Math.random() * 360)
+}
+
+
+
 ;(() => {
   const url = $request.url
 
@@ -285,7 +292,8 @@ function fetchGoods() {
     }
   } else {
     const curWeekLastWorkday = getCurWeekLastWorkday()
-    console.log('本周休息前的最后一个工作日：', curWeekLastWorkday);
+    storeValue(GLOBAL_VALUES.CUR_WORK_LAST_WORKDAY, curWeekLastWorkday || '')
+    console.log('本周休息前的最后一个工作日：', readValue(GLOBAL_VALUES.CUR_WORK_LAST_WORKDAY));
     $done({})
     
   }
