@@ -53,6 +53,24 @@ const holiday = [
 // 调休工作日
 const specialWeekdays = ['20230204', '20230218', '20230407', '20230428', '20230511', '20230914', '20230929', '20231012']
 
+// 获取当前周7天的所有日期，格式为：yyyymmdd
+function getCurWeekDays() {
+  const arr = []
+  const date = new Date()
+  const day = date.getDay()
+  const cur = new Date(date.getTime() - (day - 1) * 24 * 60 * 60 * 1000)
+  for (let i = 0; i < 7; i++) {
+    const next = new Date(cur.getTime() + i * 24 * 60 * 60 * 1000)
+    const month = `${next.getMonth() + 1}`.padStart(2, '0')
+    const dayOfMonth = `${next.getDate()}`.padStart(2, '0')
+
+    const dateStr = `${next.getFullYear()}${month}${dayOfMonth}`
+    arr.push(dateStr)
+  }
+
+  return arr
+}
+
 /**
  * 获取下周的某个日期，参数为下周几的一个数字，1-7
  * @param {number} weekday 1-7
@@ -72,6 +90,29 @@ function getNextWeekday(weekday) {
     date: dateStr,
     no: weekday,
   }
+}
+
+
+
+// 获取本周最后一个工作日
+function getCurWeekLastWorkday() {
+  const arr = getCurWeekDays()
+  let last = ''
+  
+  for (let i = 0; i < arr.length; i++) {
+    const cur = arr[i]
+    if (holiday.includes(cur)) {
+      if (last) {
+        break;
+      } else {
+        continue
+      }
+    } else {
+      last = cur
+    }
+  }
+
+  return last
 }
 
 /**
@@ -237,16 +278,9 @@ function fetchGoods() {
         })
     }
   } else {
+    const curWeekLastWorkday = getCurWeekLastWorkday()
+    console.log('本周休息前的最后一个工作日：', curWeekLastWorkday);
     $done({})
-    // const sessionId = readValue(GLOBAL_VALUES.SESSION_ID_KEY)
-    // if (sessionId) {
-    //   Promise.all([fetchGoods()])
-    //     .then(([res1]) => {
-    //       $notification.post('Goods', `数量：${res1.length}`, `工作日：${readValue(GLOBAL_VALUES.WORK_DAYS_KEY)}，sessionIdDate: ${readValue(GLOBAL_VALUES.SESSION_ID_DATE_KEY)}, today: ${getToday()}`)
-    //     })
-    //     .finally(() => {
-    //       $done({})
-    //     })
-    // }
+    
   }
 })()
