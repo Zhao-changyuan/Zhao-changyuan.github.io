@@ -56,10 +56,10 @@ function getGoods() {
 function fetchPreMenu(sessionId, weekday) {
   const { key, date, no } = weekday
   return new Promise((resolve, reject) => {
-    const status = readValue(key)
-    console.log(`${key}:`, status)
-    if (+status >= 2) {
-      resolve(status)
+    const oldCount = +readValue(key)
+    console.log(`${key}:`, oldCount)
+    if (oldCount >= 2) {
+      resolve(oldCount)
       return
     }
 
@@ -84,7 +84,7 @@ function fetchPreMenu(sessionId, weekday) {
             console.log(`${date}, desc: ${desc}!!!`)
             reject(desc)
           } else {
-            const oldCount = +status
+            // const oldCount = +status
 
             // 当日菜单数量未更新，不提醒
             if (data.length > 1 && oldCount !== (data.length - 1)) {
