@@ -84,7 +84,10 @@ function fetchPreMenu(sessionId, weekday) {
             console.log(`${date}, desc: ${desc}!!!`)
             reject(desc)
           } else {
-            if (data.length > 1) {
+            const oldCount = +status
+
+            // 当日菜单数量未更新，不提醒 
+            if (data.length > 1 && oldCount !== (data.length - 1)) {
               const goods = getGoods()
               const data1 = data.slice(1)
               const menuStr = data1.map((item) => {
