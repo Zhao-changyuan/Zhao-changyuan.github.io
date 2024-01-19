@@ -86,7 +86,7 @@ function fetchPreMenu(sessionId, weekday) {
           } else {
             const oldCount = +status
 
-            // 当日菜单数量未更新，不提醒 
+            // 当日菜单数量未更新，不提醒
             if (data.length > 1 && oldCount !== (data.length - 1)) {
               const goods = getGoods()
               const data1 = data.slice(1)
