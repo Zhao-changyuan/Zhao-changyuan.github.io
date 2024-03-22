@@ -58,7 +58,12 @@ const specialWeekdays = ['20240204', '20240218', '20240407', '20240428', '202405
 function getCurWeekDays() {
   const arr = []
   const date = new Date()
-  const day = date.getDay()
+  let day = date.getDay()
+  // 默认周日day=0，后面依次1-6
+  if (day === 0) {
+    day = 7;
+  }
+
   const cur = new Date(date.getTime() - (day - 1) * 24 * 60 * 60 * 1000)
   for (let i = 0; i < 7; i++) {
     const next = new Date(cur.getTime() + i * 24 * 60 * 60 * 1000)
