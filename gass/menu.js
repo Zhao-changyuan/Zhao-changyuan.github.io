@@ -171,17 +171,17 @@ function getToday() {
 
       const workdays = JSON.parse(workdaysStr)
 
-      if (
-        workdays.every((item) => {
-          const { key } = item
-          const goodNum = readValue(key)
-          return +goodNum >= 2
-        })
-      ) {
-        console.log('菜单已更新')
-        $done({})
-        return
-      }
+      // if (
+      //   workdays.every((item) => {
+      //     const { key } = item
+      //     const goodNum = readValue(key)
+      //     return +goodNum >= 2
+      //   })
+      // ) {
+      //   console.log('菜单已更新')
+      //   $done({})
+      //   return
+      // }
 
       // 先更新最新商品
       fetchGoods().then(() => {
