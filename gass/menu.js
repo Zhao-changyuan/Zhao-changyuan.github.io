@@ -4,7 +4,7 @@ const GLOBAL_VALUES = {
   SESSION_ID_DATE_KEY: 'gassSessionIdDate',
   GOODS: 'gassGoods',
   WORK_DAYS_KEY: 'gassWorkDays',
-  CUR_WORK_LAST_WORKDAY: 'curWeekLastWorkday'
+  CUR_WORK_LAST_WORKDAY: 'curWeekLastWorkday',
 }
 
 /**
@@ -34,9 +34,32 @@ function getSessionId() {
   return readValue('gassSessionId')
 }
 
+function fetchGoods() {
+  return new Promise((resolve, reject) => {
+    $httpClient.post(
+      {
+        url: `https://wgzx.gass.cn:18085/order/FetchGoods`,
+        headers: {
+          Accept: 'application/json, text/plain, */*',
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      },
+      (err, response, body) => {
+        if (err) {
+          reject(err)
+        } else {
+          const res = JSON.parse(body)
+          storeValue(GLOBAL_VALUES.GOODS, JSON.stringify(res.data))
+          resolve(res.data)
+        }
+      }
+    )
+  })
+}
+
 /**
  * 获取所有商品
- * @returns 
+ * @returns
  */
 function getGoods() {
   const str = readValue(GLOBAL_VALUES.GOODS)
@@ -87,14 +110,16 @@ function fetchPreMenu(sessionId, weekday) {
             // const oldCount = +status
 
             // 当日菜单数量未更新，不提醒
-            if (data.length > 1 && oldCount !== (data.length - 1)) {
+            if (data.length > 1 && oldCount !== data.length - 1) {
               const goods = getGoods()
               const data1 = data.slice(1)
-              const menuStr = data1.map((item) => {
-                const { goodsNo } = item
-                const good = goods.find((good) => good.goodsNo === goodsNo)
-                return good.goodsName
-              }).join(',')
+              const menuStr = data1
+                .map((item) => {
+                  const { goodsNo } = item
+                  const good = goods.find((good) => good.goodsNo === goodsNo)
+                  return good.goodsName
+                })
+                .join(',')
 
               $notification.post(`${date.substring(2)}周${no}-王子请下单`, menuStr, menuStr)
               storeValue(key, `${data1.length}`)
@@ -137,37 +162,41 @@ function getToday() {
     } else {
       // 仅在本周第一个连续工作区间的最后一个工作日执行
       const curWeekLastWorkday = readValue(GLOBAL_VALUES.CUR_WORK_LAST_WORKDAY)
-      console.log(`本周第一个连续工作区间的最后一个工作日为:${curWeekLastWorkday}`);
+      console.log(`本周第一个连续工作区间的最后一个工作日为:${curWeekLastWorkday}`)
       if (!curWeekLastWorkday || curWeekLastWorkday !== getToday()) {
-        console.log('非菜单可能更新日期，跳过！！！');
-        $done({})
-        return;
-      }
-
-
-      const workdays = JSON.parse(workdaysStr)
-      
-      if (workdays.every(item => {
-        const { key } = item
-        const goodNum = readValue(key)
-        return +goodNum >= 2
-      })) {
-        console.log('菜单已更新');
+        console.log('非菜单可能更新日期，跳过！！！')
         $done({})
         return
       }
 
-      Promise.all([workdays.forEach((weekday) => fetchPreMenu(sessionId, weekday))])
-        .then((res) => {
-          console.log('weekdayData:', res)
+      const workdays = JSON.parse(workdaysStr)
+
+      if (
+        workdays.every((item) => {
+          const { key } = item
+          const goodNum = readValue(key)
+          return +goodNum >= 2
         })
-        .catch((error) => {
-          console.error(error)
-          $notification.post('刷新菜单失败', error)
-        })
-        .finally(() => {
-          $done({})
-        })
+      ) {
+        console.log('菜单已更新')
+        $done({})
+        return
+      }
+
+      // 先更新最新商品
+      fetchGoods().then(() => {
+        Promise.all([workdays.forEach((weekday) => fetchPreMenu(sessionId, weekday))])
+          .then((res) => {
+            console.log('weekdayData:', res)
+          })
+          .catch((error) => {
+            console.error(error)
+            $notification.post('刷新菜单失败', error)
+          })
+          .finally(() => {
+            $done({})
+          })
+      })
     }
   }
 })()
