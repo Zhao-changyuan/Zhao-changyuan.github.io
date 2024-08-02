@@ -96,7 +96,7 @@ function fetchPreMenu(sessionId, weekday) {
                 return good.goodsName
               }).join(',')
 
-              $notification.post(`${date}(下周${no})菜单 王子请下单`, menuStr, menuStr)
+              $notification.post(`${date.substring(2)}周${no}-王子请下单`, menuStr, menuStr)
               storeValue(key, `${data1.length}`)
             } else {
               console.log(`${date} 菜单未更新!!!!`)
