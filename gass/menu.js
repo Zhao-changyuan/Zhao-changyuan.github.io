@@ -107,12 +107,11 @@ function fetchPreMenu(sessionId, weekday) {
             console.log('FetchPreMenu data:', data.length, JSON.stringify(data))
 
             // 当日菜单数量未更新，不提醒
-            const newCount = data.length - 1
+            const newCount = data.length
             if (data.length > 1 && oldCount !== newCount) {
               // 获取商品信息
               fetchGoods().then((goods) => {
-                const data1 = data.slice(1)
-                const menuStr = data1
+                const menuStr = data
                   .map((item) => {
                     const { goodsNo } = item
                     const good = goods.find((good) => good.goodsNo === goodsNo)
