@@ -119,7 +119,7 @@ function fetchPreMenu(sessionId, weekday) {
                   })
                   .join(',')
 
-                $notification.post(`${date.substring(2)}周${no}-王子请下单`, `共${newCount}，上新${newCount - oldCount}个! ${menuStr}`)
+                $notification.post(`${date.substring(2)}周${no}-王子请下单`, `共${newCount}，上新${newCount - oldCount}个!`, menuStr)
                 storeValue(key, `${newCount}`)
               })
             } else {
