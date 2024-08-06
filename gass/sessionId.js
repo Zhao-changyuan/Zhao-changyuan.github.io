@@ -295,7 +295,7 @@ function getRandom() {
             // $notification.post('Goods', `数量：${res1.length}`, `工作日：${readValue(GLOBAL_VALUES.WORK_DAYS_KEY)}`)
           })
           .finally(() => {
-            $done({})
+            // $done({})
           })
         // return
       }
