@@ -184,7 +184,7 @@ function getCurWeekWorkdays() {
       }
     }
   }
-  
+
   return arr
 }
 
@@ -347,6 +347,8 @@ function getRandom() {
     const curWeekLastWorkday = getCurWeekLastWorkday()
     storeValue(GLOBAL_VALUES.CUR_WORK_LAST_WORKDAY, curWeekLastWorkday || '')
     console.log('本周休息前的最后一个工作日：', readValue(GLOBAL_VALUES.CUR_WORK_LAST_WORKDAY));
+    console.log('cur workdays：', readValue(GLOBAL_VALUES.CUR_WORK_DAYS_KEY));
+    console.log('next workdays：', readValue(GLOBAL_VALUES.WORK_DAYS_KEY));
     $done({})
     
   }
