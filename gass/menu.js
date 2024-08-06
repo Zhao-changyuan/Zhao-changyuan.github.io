@@ -104,14 +104,25 @@ function fetchPreMenu(sessionId, weekday) {
             console.log(`${date}, desc: ${desc}!!!`)
             reject(desc)
           } else {
-            console.log('FetchPreMenu data:', data.length, JSON.stringify(data));
+            console.log('FetchPreMenu data:', data.length, JSON.stringify(data))
 
             // 当日菜单数量未更新，不提醒
             const newCount = data.length - 1
             if (data.length > 1 && oldCount !== newCount) {
+              // 获取商品信息
+              fetchGoods().then((goods) => {
+                const data1 = data.slice(1)
+                const menuStr = data1
+                  .map((item) => {
+                    const { goodsNo } = item
+                    const good = goods.find((good) => good.goodsNo === goodsNo)
+                    return good.goodsName
+                  })
+                  .join(',')
 
-              $notification.post(`${date.substring(2)}周${no}-王子请下单`, `共${newCount}，上新${newCount - oldCount}个!`)
-              storeValue(key, `${newCount}`)
+                $notification.post(`${date.substring(2)}周${no}-王子请下单`, `共${newCount}，上新${newCount - oldCount}个! ${menuStr}`)
+                storeValue(key, `${newCount}`)
+              })
             } else {
               console.log(`${date} 菜单未更新!!!!`)
             }
