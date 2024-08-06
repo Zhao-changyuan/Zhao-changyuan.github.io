@@ -4,6 +4,7 @@ const GLOBAL_VALUES = {
   SESSION_ID_DATE_KEY: 'gassSessionIdDate',
   GOODS: 'gassGoods',
   WORK_DAYS_KEY: 'gassWorkDays',
+  CUR_WORK_DAYS_KEY: 'curGassWorkDays',
   CUR_WORK_LAST_WORKDAY: 'curWeekLastWorkday',
 }
 
@@ -156,8 +157,10 @@ function getToday() {
     $done({})
     return
   } else {
+    const curWorkdaysStr = readValue(GLOBAL_VALUES.CUR_WORK_DAYS_KEY)
     const workdaysStr = readValue(GLOBAL_VALUES.WORK_DAYS_KEY)
-    if (!workdaysStr) {
+
+    if (!curWorkdaysStr || !workdaysStr) {
       $notification.post('刷新菜单失败', '未获取到工作日，请登录小程序')
       $done({})
       return
@@ -171,6 +174,7 @@ function getToday() {
       //   return
       // }
 
+      const curWeekDays = JSON.parse(curWorkdaysStr)
       const workdays = JSON.parse(workdaysStr)
 
       // if (
@@ -185,7 +189,7 @@ function getToday() {
       //   return
       // }
 
-      Promise.all([workdays.forEach((weekday) => fetchPreMenu(sessionId, weekday))])
+      Promise.all([[...curWeekDays, ...workdays].forEach((weekday) => fetchPreMenu(sessionId, weekday))])
         .then((res) => {
           console.log('weekdayData:', res)
         })

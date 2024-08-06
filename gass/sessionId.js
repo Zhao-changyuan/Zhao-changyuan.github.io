@@ -7,6 +7,7 @@ const GLOBAL_VALUES = {
   SESSION_ID_DATE_KEY: 'gassSessionIdDate',
   GOODS: 'gassGoods',
   WORK_DAYS_KEY: 'gassWorkDays',
+  CUR_WORK_DAYS_KEY: 'curGassWorkDays',
   CUR_WORK_LAST_WORKDAY: 'curWeekLastWorkday'
 }
 
@@ -143,6 +144,29 @@ function getNextWeekWorkdays() {
 
   return arr
 }
+
+/**
+ * 获取本周的工作日
+ * @returns {Array<{key: string, date: string}>}
+ */
+function getCurWeekWorkdays() {
+  const arr = []
+  const curWeekDays = getCurWeekDays()
+  for (let i = 0; i < curWeekDays.length; i++) {
+    const cur = curWeekDays[i]
+    if (i <= 5) {
+      if (!holiday.includes(cur.date)) {
+        arr.push(cur)
+      }
+    } else {
+      if (specialWeekdays.includes(cur.date)) {
+        arr.push(cur)
+      }
+    }
+  }
+  return arr
+}
+
 
 // 获取今日日期，格式为 20241229
 function getToday() {
@@ -286,6 +310,9 @@ function getRandom() {
 
       const workdays = getNextWeekWorkdays()
       storeValue(GLOBAL_VALUES.WORK_DAYS_KEY, JSON.stringify(workdays))
+
+      const curWorkdays = getCurWeekWorkdays()
+      storeValue(GLOBAL_VALUES.CUR_WORK_DAYS_KEY, JSON.stringify(curWorkdays))
 
       Promise.all([fetchIndex(sessionId), fetchOrderQueryAcc(sessionId), fetchGoods()])
         .then(([res1, res2, res3]) => {
