@@ -108,7 +108,7 @@ function fetchPreMenu(sessionId, weekday) {
             console.log(`${date}, desc: ${desc}!!!`)
             reject(desc)
           } else {
-            console.log('FetchPreMenu', data1);
+            console.log('FetchPreMenu data:', data);
 
             // 当日菜单数量未更新，不提醒
             if (data.length > 1 && oldCount !== data.length - 1) {
