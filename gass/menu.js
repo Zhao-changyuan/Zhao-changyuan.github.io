@@ -81,11 +81,7 @@ function fetchPreMenu(sessionId, weekday) {
   const { key, date, no } = weekday
   return new Promise((resolve, reject) => {
     const oldCount = +readValue(key)
-    console.log(`${key}:`, oldCount)
-    if (oldCount >= 2) {
-      resolve(oldCount)
-      return
-    }
+    console.log(`${key} oldCount:`, oldCount)
 
     const body = `SessionId=${sessionId}&RoomNo=1&ReserveDate=${date}&SegNo=2`
     $httpClient.post(
@@ -108,23 +104,14 @@ function fetchPreMenu(sessionId, weekday) {
             console.log(`${date}, desc: ${desc}!!!`)
             reject(desc)
           } else {
-            console.log('FetchPreMenu data:', data);
+            console.log('FetchPreMenu data:', data.length, JSON.stringify(data));
 
             // 当日菜单数量未更新，不提醒
-            if (data.length > 1 && oldCount !== data.length - 1) {
-              const goods = getGoods()
-              const data1 = data.slice(1)
+            const newCount = data.length - 1
+            if (data.length > 1 && oldCount !== newCount) {
 
-              const menuStr = data1
-                .map((item) => {
-                  const { goodsNo } = item
-                  const good = goods.find((good) => good.goodsNo === goodsNo)
-                  return good.goodsName
-                })
-                .join(',')
-
-              $notification.post(`${date.substring(2)}周${no}-王子请下单`, menuStr, menuStr)
-              storeValue(key, `${data1.length}`)
+              $notification.post(`${date.substring(2)}周${no}-王子请下单`, `共${newCount}，上新${newCount - oldCount}个!`)
+              storeValue(key, `${newCount}`)
             } else {
               console.log(`${date} 菜单未更新!!!!`)
             }
