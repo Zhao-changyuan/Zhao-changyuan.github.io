@@ -113,6 +113,8 @@ function fetchPreMenu(sessionId, weekday) {
             if (data.length > 1 && oldCount !== data.length - 1) {
               const goods = getGoods()
               const data1 = data.slice(1)
+
+              console.log('FetchPreMenu', data1);
               const menuStr = data1
                 .map((item) => {
                   const { goodsNo } = item
@@ -163,11 +165,11 @@ function getToday() {
       // 仅在本周第一个连续工作区间的最后一个工作日执行
       const curWeekLastWorkday = readValue(GLOBAL_VALUES.CUR_WORK_LAST_WORKDAY)
       console.log(`本周第一个连续工作区间的最后一个工作日为:${curWeekLastWorkday}`)
-      if (!curWeekLastWorkday || curWeekLastWorkday !== getToday()) {
-        console.log('非菜单可能更新日期，跳过！！！')
-        $done({})
-        return
-      }
+      // if (!curWeekLastWorkday || curWeekLastWorkday !== getToday()) {
+      //   console.log('非菜单可能更新日期，跳过！！！')
+      //   $done({})
+      //   return
+      // }
 
       const workdays = JSON.parse(workdaysStr)
 
@@ -183,20 +185,17 @@ function getToday() {
       //   return
       // }
 
-      // 先更新最新商品
-      fetchGoods().then(() => {
-        Promise.all([workdays.forEach((weekday) => fetchPreMenu(sessionId, weekday))])
-          .then((res) => {
-            console.log('weekdayData:', res)
-          })
-          .catch((error) => {
-            console.error(error)
-            $notification.post('刷新菜单失败', error)
-          })
-          .finally(() => {
-            $done({})
-          })
-      })
+      Promise.all([workdays.forEach((weekday) => fetchPreMenu(sessionId, weekday))])
+        .then((res) => {
+          console.log('weekdayData:', res)
+        })
+        .catch((error) => {
+          console.error(error)
+          $notification.post('刷新菜单失败', error)
+        })
+        .finally(() => {
+          $done({})
+        })
     }
   }
 })()
