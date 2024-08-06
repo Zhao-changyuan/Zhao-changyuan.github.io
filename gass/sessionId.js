@@ -99,6 +99,27 @@ function getNextWeekday(weekday) {
   }
 }
 
+/**
+ * 获取本周的某个日期，参数为周几的一个数字，1-7
+ * @param {number} weekday 1-7
+ * @returns
+ */
+function getCurWeekday(weekday) {
+  const date = new Date()
+  const day = date.getDay()
+  const curWeekday = new Date(date.getTime() - (day - weekday) * 24 * 60 * 60 * 1000)
+  const month = `${curWeekday.getMonth() + 1}`.padStart(2, '0')
+  const dayOfMonth = `${curWeekday.getDate()}`.padStart(2, '0')
+
+  const dateStr = `${curWeekday.getFullYear()}${month}${dayOfMonth}`
+
+  return {
+    key: `menu${dateStr}`,
+    date: dateStr,
+    no: weekday,
+  }
+}
+
 
 
 // 获取本周最后一个工作日
@@ -151,9 +172,8 @@ function getNextWeekWorkdays() {
  */
 function getCurWeekWorkdays() {
   const arr = []
-  const curWeekDays = getCurWeekDays()
-  for (let i = 0; i < curWeekDays.length; i++) {
-    const cur = curWeekDays[i]
+  for (let i = 1; i <= 7; i++) {
+    const cur = getCurWeekday(i)
     if (i <= 5) {
       if (!holiday.includes(cur.date)) {
         arr.push(cur)
@@ -164,6 +184,7 @@ function getCurWeekWorkdays() {
       }
     }
   }
+  
   return arr
 }
 
