@@ -297,7 +297,7 @@ function getRandom() {
           .finally(() => {
             $done({})
           })
-        return
+        // return
       }
 
       storeValue(GLOBAL_VALUES.SESSION_ID_KEY, sessionId)
