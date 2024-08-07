@@ -80,7 +80,7 @@ function getGoods() {
 function fetchPreMenu(sessionId, weekday) {
   const { key, date, no } = weekday
   return new Promise((resolve, reject) => {
-    const oldCount = +readValue(key)
+    const oldCount = readValue(key) ? +readValue(key) : 0
     console.log(`${key} oldCount:`, oldCount)
 
     const body = `SessionId=${sessionId}&RoomNo=1&ReserveDate=${date}&SegNo=2`
@@ -114,8 +114,11 @@ function fetchPreMenu(sessionId, weekday) {
                 const menuStr = data
                   .map((item) => {
                     const { goodsNo } = item
+
+                    // 获取商品详情
                     const good = goods.find((good) => good.goodsNo === goodsNo)
-                    return good.goodsName
+
+                    return `${good.goodsName}:${goodsNo}`
                   })
                   .join(',')
 
@@ -161,29 +164,8 @@ function getToday() {
       $done({})
       return
     } else {
-      // 仅在本周第一个连续工作区间的最后一个工作日执行
-      const curWeekLastWorkday = readValue(GLOBAL_VALUES.CUR_WORK_LAST_WORKDAY)
-      console.log(`本周第一个连续工作区间的最后一个工作日为:${curWeekLastWorkday}`)
-      // if (!curWeekLastWorkday || curWeekLastWorkday !== getToday()) {
-      //   console.log('非菜单可能更新日期，跳过！！！')
-      //   $done({})
-      //   return
-      // }
-
       const curWeekDays = JSON.parse(curWorkdaysStr)
       const workdays = JSON.parse(workdaysStr)
-
-      // if (
-      //   workdays.every((item) => {
-      //     const { key } = item
-      //     const goodNum = readValue(key)
-      //     return +goodNum >= 2
-      //   })
-      // ) {
-      //   console.log('菜单已更新')
-      //   $done({})
-      //   return
-      // }
 
       Promise.all([[...curWeekDays, ...workdays].forEach((weekday) => fetchPreMenu(sessionId, weekday))])
         .then((res) => {

@@ -308,18 +308,7 @@ function getRandom() {
 
     const { sessionId } = res
     if (sessionId) {
-      const sessionIdDate = readValue(GLOBAL_VALUES.SESSION_ID_DATE_KEY)
       const today = getToday()
-      if (sessionIdDate === today) {
-        Promise.all([fetchGoods()])
-          .then(([res1]) => {
-            // $notification.post('Goods', `数量：${res1.length}`, `工作日：${readValue(GLOBAL_VALUES.WORK_DAYS_KEY)}`)
-          })
-          .finally(() => {
-            // $done({})
-          })
-        // return
-      }
 
       storeValue(GLOBAL_VALUES.SESSION_ID_KEY, sessionId)
       storeValue(GLOBAL_VALUES.SESSION_ID_DATE_KEY, today)
@@ -335,7 +324,7 @@ function getRandom() {
       const curWorkdays = getCurWeekWorkdays()
       storeValue(GLOBAL_VALUES.CUR_WORK_DAYS_KEY, JSON.stringify(curWorkdays))
 
-      Promise.all([fetchIndex(sessionId), fetchOrderQueryAcc(sessionId), fetchGoods()])
+      Promise.all([fetchIndex(sessionId), fetchOrderQueryAcc(sessionId)])
         .then(([res1, res2, res3]) => {
           // $notification.post('Goods', `数量：${res3.length}`, `下周工作日：${readValue(GLOBAL_VALUES.WORK_DAYS_KEY)}`)
         })
