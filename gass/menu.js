@@ -126,7 +126,7 @@ function fetchPreMenu(sessionId, weekday) {
                 storeValue(key, `${newCount}`)
               })
             } else {
-              console.log(`${date} 菜单未更新!!!!`)
+              console.log(`${date} 菜单无变化!!!`)
             }
 
             resolve(data)
