@@ -321,8 +321,8 @@ function getRandom() {
       const workdays = getNextWeekWorkdays()
       storeValue(GLOBAL_VALUES.WORK_DAYS_KEY, JSON.stringify(workdays))
 
-      const curWorkdays = getCurWeekWorkdays()
-      storeValue(GLOBAL_VALUES.CUR_WORK_DAYS_KEY, JSON.stringify(curWorkdays))
+      // const curWorkdays = getCurWeekWorkdays()
+      // storeValue(GLOBAL_VALUES.CUR_WORK_DAYS_KEY, JSON.stringify(curWorkdays))
 
       Promise.all([fetchIndex(sessionId), fetchOrderQueryAcc(sessionId)])
         .then(([res1, res2, res3]) => {
@@ -333,10 +333,12 @@ function getRandom() {
         })
     }
   } else {
+    storeValue(GLOBAL_VALUES.CUR_WORK_DAYS_KEY, '')
+
     const curWeekLastWorkday = getCurWeekLastWorkday()
     storeValue(GLOBAL_VALUES.CUR_WORK_LAST_WORKDAY, curWeekLastWorkday || '')
     console.log('cur work last workday:', readValue(GLOBAL_VALUES.CUR_WORK_LAST_WORKDAY));
-    console.log('cur workdays:', readValue(GLOBAL_VALUES.CUR_WORK_DAYS_KEY));
+    // console.log('cur workdays:', readValue(GLOBAL_VALUES.CUR_WORK_DAYS_KEY));
     console.log('next workdays', readValue(GLOBAL_VALUES.WORK_DAYS_KEY));
     $done({})
     

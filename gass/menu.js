@@ -156,18 +156,17 @@ function getToday() {
     $done({})
     return
   } else {
-    const curWorkdaysStr = readValue(GLOBAL_VALUES.CUR_WORK_DAYS_KEY)
+    // const curWorkdaysStr = readValue(GLOBAL_VALUES.CUR_WORK_DAYS_KEY)
     const workdaysStr = readValue(GLOBAL_VALUES.WORK_DAYS_KEY)
 
-    if (!curWorkdaysStr || !workdaysStr) {
+    if (!workdaysStr) {
       $notification.post('刷新菜单失败', '未获取到工作日，请登录小程序')
       $done({})
       return
     } else {
-      const curWeekDays = JSON.parse(curWorkdaysStr)
       const workdays = JSON.parse(workdaysStr)
 
-      Promise.all([[...curWeekDays, ...workdays].forEach((weekday) => fetchPreMenu(sessionId, weekday))])
+      Promise.all([workdays.forEach((weekday) => fetchPreMenu(sessionId, weekday))])
         .then((res) => {
           console.log('weekdayData:', res)
         })
