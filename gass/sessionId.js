@@ -312,7 +312,7 @@ function getRandom() {
 
       storeValue(GLOBAL_VALUES.SESSION_ID_KEY, sessionId)
       storeValue(GLOBAL_VALUES.SESSION_ID_DATE_KEY, today)
-      // $notification.post(`${today}已登录`, sessionId, sessionId)
+      $notification.post(`${today}已登录`, sessionId, sessionId)
 
       const curWeekLastWorkday = getCurWeekLastWorkday()
       storeValue(GLOBAL_VALUES.CUR_WORK_LAST_WORKDAY, curWeekLastWorkday || '')
