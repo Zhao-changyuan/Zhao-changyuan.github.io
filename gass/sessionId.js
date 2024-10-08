@@ -340,6 +340,7 @@ function getRandom() {
     console.log('cur work last workday:', readValue(GLOBAL_VALUES.CUR_WORK_LAST_WORKDAY));
     // console.log('cur workdays:', readValue(GLOBAL_VALUES.CUR_WORK_DAYS_KEY));
     console.log('next workdays', readValue(GLOBAL_VALUES.WORK_DAYS_KEY));
+    console.log('sessionId', readValue(GLOBAL_VALUES.SESSION_ID_KEY), readValue(GLOBAL_VALUES.SESSION_ID_DATE_KEY));
     $done({})
     
   }
