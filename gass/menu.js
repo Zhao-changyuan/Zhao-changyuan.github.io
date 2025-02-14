@@ -35,15 +35,16 @@ function getSessionId() {
   return readValue('gassSessionId')
 }
 
-function fetchGoods() {
+function fetchGoods(sessionId) {
   return new Promise((resolve, reject) => {
     $httpClient.post(
       {
-        url: `https://wgzx.gass.cn:18085/order/FetchGoods`,
+        url: `https://wgzx.gass.cn:18083/home/FetchGoods`,
         headers: {
           Accept: 'application/json, text/plain, */*',
           'Content-Type': 'application/x-www-form-urlencoded',
         },
+        body: `SessionId=${sessionId}`,
       },
       (err, response, body) => {
         if (err) {
@@ -86,7 +87,7 @@ function fetchPreMenu(sessionId, weekday) {
     const body = `SessionId=${sessionId}&RoomNo=1&ReserveDate=${date}&SegNo=2`
     $httpClient.post(
       {
-        url: 'https://wgzx.gass.cn:18085/order/FetchPreMenu',
+        url: 'https://wgzx.gass.cn:18083/home/FetchPreMenu',
         headers: {
           Accept: 'application/json, text/plain, */*',
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -110,7 +111,7 @@ function fetchPreMenu(sessionId, weekday) {
             const newCount = data.length
             if (data.length > 1 && oldCount !== newCount) {
               // 获取商品信息
-              fetchGoods().then((goods) => {
+              fetchGoods(sessionId).then((goods) => {
                 const menuStr = data
                   .map((item) => {
                     const { goodsNo } = item
