@@ -108,7 +108,15 @@ function fetchPreMenu(sessionId, weekday) {
         ReserveDate: date,
         SegNo: '2',
       })
-      console.log('body', body);
+      console.log('body', body, {
+        url: `https://wgzx.gass.cn:18083/home/FetchPreMenu?${body}`,
+        headers: {
+          Accept: 'application/json, text/plain, */*',
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        params: body,
+        body: body,
+      },);
       $httpClient.post(
         {
           url: `https://wgzx.gass.cn:18083/home/FetchPreMenu?${body}`,
