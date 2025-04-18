@@ -260,7 +260,10 @@ function fetchOrderQueryAcc(sessionId) {
           Accept: 'application/json, text/plain, */*',
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: `SessionId=${sessionId}`,
+        // body: `SessionId=${sessionId}`,
+        body: new URLSearchParams({
+          SessionId: sessionId
+        }).toString(),
       },
       (err, response, body) => {
         if (err) {

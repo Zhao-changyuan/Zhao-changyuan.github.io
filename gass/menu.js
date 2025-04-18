@@ -44,7 +44,10 @@ function fetchGoods(sessionId) {
           Accept: 'application/json, text/plain, */*',
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: `SessionId=${sessionId}`,
+        // body: `SessionId=${sessionId}`,
+        body: new URLSearchParams({
+          SessionId: sessionId
+        }).toString(),
       },
       (err, response, body) => {
         if (err) {
@@ -84,7 +87,7 @@ function fetchPreMenu(sessionId, weekday) {
     const oldCount = readValue(key) ? +readValue(key) : 0
     console.log(`${key} oldCount:`, oldCount)
 
-    const body = `SessionId=${sessionId}&RoomNo=1&ReserveDate=${date}&SegNo=2`
+    // const body = `SessionId=${sessionId}&RoomNo=1&ReserveDate=${date}&SegNo=2`
     console.log(`${key} body:`, body);
     $httpClient.post(
       {
@@ -93,7 +96,12 @@ function fetchPreMenu(sessionId, weekday) {
           Accept: 'application/json, text/plain, */*',
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body,
+        body: new URLSearchParams({
+          SessionId: sessionId,
+          RoomNo: '1',
+          ReserveDate: date,
+          SegNo: '2',
+        }).toString(),
       },
       (error, response, body) => {
         if (error) {
