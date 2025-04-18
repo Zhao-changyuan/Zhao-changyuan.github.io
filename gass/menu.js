@@ -46,7 +46,7 @@ function fetchGoods(sessionId) {
         },
         // body: `SessionId=${sessionId}`,
         body: new URLSearchParams({
-          SessionId: sessionId
+          SessionId: sessionId,
         }).toString(),
       },
       (err, response, body) => {
@@ -85,70 +85,78 @@ function fetchPreMenu(sessionId, weekday) {
   const { key, date, no } = weekday
   return new Promise((resolve, reject) => {
     const oldCount = readValue(key) ? +readValue(key) : 0
-    console.log(`${key} oldCount:`, oldCount)
+    console.log(`${key} oldCount:`, oldCount, typeof URLSearchParams)
 
-    // const body = `SessionId=${sessionId}&RoomNo=1&ReserveDate=${date}&SegNo=2`
-    console.log(`${key} body:`, new URLSearchParams({
-      SessionId: sessionId,
-      RoomNo: '1',
-      ReserveDate: date,
-      SegNo: '2',
-    }).toString());
-    $httpClient.post(
-      {
-        url: 'https://wgzx.gass.cn:18083/home/FetchPreMenu',
-        headers: {
-          Accept: 'application/json, text/plain, */*',
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
+    try {
+      // const body = `SessionId=${sessionId}&RoomNo=1&ReserveDate=${date}&SegNo=2`
+      console.log(
+        `${key} body:`,
+        new URLSearchParams({
           SessionId: sessionId,
           RoomNo: '1',
           ReserveDate: date,
           SegNo: '2',
-        }).toString(),
-      },
-      (error, response, body) => {
-        if (error) {
-          reject(error)
-        } else {
-          const res = JSON.parse(body)
-          const { retcode, desc, data } = res
-
-          if (retcode !== 0) {
-            console.log(`${date}, desc: ${desc}!!!`)
-            reject(desc)
+        }).toString()
+      )
+      $httpClient.post(
+        {
+          url: 'https://wgzx.gass.cn:18083/home/FetchPreMenu',
+          headers: {
+            Accept: 'application/json, text/plain, */*',
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+            SessionId: sessionId,
+            RoomNo: '1',
+            ReserveDate: date,
+            SegNo: '2',
+          }).toString(),
+        },
+        (error, response, body) => {
+          if (error) {
+            reject(error)
           } else {
-            console.log('FetchPreMenu data:', data.length, JSON.stringify(data))
+            const res = JSON.parse(body)
+            const { retcode, desc, data } = res
 
-            // 当日菜单数量未更新，不提醒
-            const newCount = data.length
-            if (data.length > 1 && oldCount !== newCount) {
-              // 获取商品信息
-              fetchGoods(sessionId).then((goods) => {
-                const menuStr = data
-                  .map((item) => {
-                    const { goodsNo } = item
-
-                    // 获取商品详情
-                    const good = goods.find((good) => good.goodsNo === goodsNo)
-
-                    return `${good.goodsName}:${goodsNo}`
-                  })
-                  .join(',')
-
-                $notification.post(`${date.substring(2)}周${no}-王子请下单`, `共${newCount}，上新${newCount - oldCount}个!`, menuStr)
-                storeValue(key, `${newCount}`)
-              })
+            if (retcode !== 0) {
+              console.log(`${date}, desc: ${desc}!!!`)
+              reject(desc)
             } else {
-              console.log(`${date} 菜单无变化!!!`)
-            }
+              console.log('FetchPreMenu data:', data.length, JSON.stringify(data))
 
-            resolve(data)
+              // 当日菜单数量未更新，不提醒
+              const newCount = data.length
+              if (data.length > 1 && oldCount !== newCount) {
+                // 获取商品信息
+                fetchGoods(sessionId).then((goods) => {
+                  const menuStr = data
+                    .map((item) => {
+                      const { goodsNo } = item
+
+                      // 获取商品详情
+                      const good = goods.find((good) => good.goodsNo === goodsNo)
+
+                      return `${good.goodsName}:${goodsNo}`
+                    })
+                    .join(',')
+
+                  $notification.post(`${date.substring(2)}周${no}-王子请下单`, `共${newCount}，上新${newCount - oldCount}个!`, menuStr)
+                  storeValue(key, `${newCount}`)
+                })
+              } else {
+                console.log(`${date} 菜单无变化!!!`)
+              }
+
+              resolve(data)
+            }
           }
         }
-      }
-    )
+      )
+    } catch (error) {
+      console.error(error)
+    } finally {
+    }
   })
 }
 
