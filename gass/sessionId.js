@@ -58,6 +58,16 @@ const specialWeekdays = [
   '20251011', // 国庆节调休
 ];
 
+function encodeFormData(data) {
+  const pairs = [];
+  for (const key in data) {
+    if (data.hasOwnProperty(key)) {
+      pairs.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
+    }
+  }
+  return pairs.join('&');
+}
+
 // 获取当前周7天的所有日期，格式为：yyyymmdd
 function getCurWeekDays() {
   const arr = []
@@ -261,9 +271,9 @@ function fetchOrderQueryAcc(sessionId) {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
         // body: `SessionId=${sessionId}`,
-        body: new URLSearchParams({
+        body: encodeFormData({
           SessionId: sessionId
-        }).toString(),
+        }),
       },
       (err, response, body) => {
         if (err) {

@@ -35,6 +35,16 @@ function getSessionId() {
   return readValue('gassSessionId')
 }
 
+function encodeFormData(data) {
+  const pairs = [];
+  for (const key in data) {
+    if (data.hasOwnProperty(key)) {
+      pairs.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
+    }
+  }
+  return pairs.join('&');
+}
+
 function fetchGoods(sessionId) {
   return new Promise((resolve, reject) => {
     $httpClient.post(
@@ -75,15 +85,7 @@ function getGoods() {
   return JSON.parse(str)
 }
 
-function encodeFormData(data) {
-  const pairs = [];
-  for (const key in data) {
-    if (data.hasOwnProperty(key)) {
-      pairs.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
-    }
-  }
-  return pairs.join('&');
-}
+
 
 /**
  * 获取菜单
