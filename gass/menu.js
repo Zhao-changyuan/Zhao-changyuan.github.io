@@ -45,9 +45,9 @@ function fetchGoods(sessionId) {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
         // body: `SessionId=${sessionId}`,
-        body: new URLSearchParams({
+        body: encodeFormData({
           SessionId: sessionId,
-        }).toString(),
+        }),
       },
       (err, response, body) => {
         if (err) {
@@ -75,6 +75,16 @@ function getGoods() {
   return JSON.parse(str)
 }
 
+function encodeFormData(data) {
+  const pairs = [];
+  for (const key in data) {
+    if (data.hasOwnProperty(key)) {
+      pairs.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
+    }
+  }
+  return pairs.join('&');
+}
+
 /**
  * 获取菜单
  * @param {string} sessionId
@@ -89,15 +99,6 @@ function fetchPreMenu(sessionId, weekday) {
 
     try {
       // const body = `SessionId=${sessionId}&RoomNo=1&ReserveDate=${date}&SegNo=2`
-      console.log(
-        `${key} body:`,
-        new URLSearchParams({
-          SessionId: sessionId,
-          RoomNo: '1',
-          ReserveDate: date,
-          SegNo: '2',
-        }).toString()
-      )
       $httpClient.post(
         {
           url: 'https://wgzx.gass.cn:18083/home/FetchPreMenu',
@@ -105,12 +106,12 @@ function fetchPreMenu(sessionId, weekday) {
             Accept: 'application/json, text/plain, */*',
             'Content-Type': 'application/x-www-form-urlencoded',
           },
-          body: new URLSearchParams({
+          body: encodeFormData({
             SessionId: sessionId,
             RoomNo: '1',
             ReserveDate: date,
             SegNo: '2',
-          }).toString(),
+          }),
         },
         (error, response, body) => {
           if (error) {
