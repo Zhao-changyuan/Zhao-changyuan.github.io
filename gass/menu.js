@@ -88,7 +88,12 @@ function fetchPreMenu(sessionId, weekday) {
     console.log(`${key} oldCount:`, oldCount)
 
     // const body = `SessionId=${sessionId}&RoomNo=1&ReserveDate=${date}&SegNo=2`
-    console.log(`${key} body:`, body);
+    console.log(`${key} body:`, new URLSearchParams({
+      SessionId: sessionId,
+      RoomNo: '1',
+      ReserveDate: date,
+      SegNo: '2',
+    }).toString());
     $httpClient.post(
       {
         url: 'https://wgzx.gass.cn:18083/home/FetchPreMenu',
