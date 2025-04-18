@@ -47,15 +47,17 @@ function encodeFormData(data) {
 
 function fetchGoods(sessionId) {
   return new Promise((resolve, reject) => {
+    const body = encodeFormData({
+      SessionId: sessionId,
+    })
     $httpClient.post(
       {
-        url: `https://wgzx.gass.cn:18083/home/FetchGoods?${encodeFormData({
-          SessionId: sessionId,
-        })}`,
+        url: `https://wgzx.gass.cn:18083/home/FetchGoods?${body}`,
         headers: {
           Accept: 'application/json, text/plain, */*',
           'Content-Type': 'application/x-www-form-urlencoded',
         },
+        params: body,
       },
       (err, response, body) => {
         if (err) {
@@ -113,6 +115,7 @@ function fetchPreMenu(sessionId, weekday) {
             Accept: 'application/json, text/plain, */*',
             'Content-Type': 'application/x-www-form-urlencoded',
           },
+          params: body,
         },
         (error, response, body) => {
           if (error) {
