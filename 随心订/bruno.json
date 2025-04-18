@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "随心订",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}
