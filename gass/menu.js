@@ -49,18 +49,13 @@ function fetchGoods(sessionId) {
   return new Promise((resolve, reject) => {
     $httpClient.post(
       {
-        url: `https://wgzx.gass.cn:18083/home/FetchGoods`,
+        url: `https://wgzx.gass.cn:18083/home/FetchGoods?${encodeFormData({
+          SessionId: sessionId,
+        })}`,
         headers: {
           Accept: 'application/json, text/plain, */*',
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        // body: `SessionId=${sessionId}`,
-        body: encodeFormData({
-          SessionId: sessionId,
-        }),
-        body: encodeFormData({
-          SessionId: sessionId,
-        }),
       },
       (err, response, body) => {
         if (err) {
@@ -113,13 +108,11 @@ function fetchPreMenu(sessionId, weekday) {
       console.log('body', body);
       $httpClient.post(
         {
-          url: 'https://wgzx.gass.cn:18083/home/FetchPreMenu',
+          url: `https://wgzx.gass.cn:18083/home/FetchPreMenu?${body}`,
           headers: {
             Accept: 'application/json, text/plain, */*',
             'Content-Type': 'application/x-www-form-urlencoded',
           },
-          body,
-          data: body,
         },
         (error, response, body) => {
           if (error) {
