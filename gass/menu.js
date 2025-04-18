@@ -58,6 +58,9 @@ function fetchGoods(sessionId) {
         body: encodeFormData({
           SessionId: sessionId,
         }),
+        body: encodeFormData({
+          SessionId: sessionId,
+        }),
       },
       (err, response, body) => {
         if (err) {
@@ -101,12 +104,13 @@ function fetchPreMenu(sessionId, weekday) {
 
     try {
       // const body = `SessionId=${sessionId}&RoomNo=1&ReserveDate=${date}&SegNo=2`
-      console.log('body', encodeFormData({
+      const body = encodeFormData({
         SessionId: sessionId,
         RoomNo: '1',
         ReserveDate: date,
         SegNo: '2',
-      }));
+      })
+      console.log('body', body);
       $httpClient.post(
         {
           url: 'https://wgzx.gass.cn:18083/home/FetchPreMenu',
@@ -114,12 +118,8 @@ function fetchPreMenu(sessionId, weekday) {
             Accept: 'application/json, text/plain, */*',
             'Content-Type': 'application/x-www-form-urlencoded',
           },
-          body: encodeFormData({
-            SessionId: sessionId,
-            RoomNo: '1',
-            ReserveDate: date,
-            SegNo: '2',
-          }),
+          body,
+          data: body,
         },
         (error, response, body) => {
           if (error) {
