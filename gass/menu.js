@@ -58,6 +58,7 @@ function fetchGoods(sessionId) {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
         params: body,
+        body: body,
       },
       (err, response, body) => {
         if (err) {
@@ -116,6 +117,7 @@ function fetchPreMenu(sessionId, weekday) {
             'Content-Type': 'application/x-www-form-urlencoded',
           },
           params: body,
+          body: body,
         },
         (error, response, body) => {
           if (error) {
