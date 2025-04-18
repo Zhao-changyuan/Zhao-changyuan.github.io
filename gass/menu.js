@@ -101,6 +101,12 @@ function fetchPreMenu(sessionId, weekday) {
 
     try {
       // const body = `SessionId=${sessionId}&RoomNo=1&ReserveDate=${date}&SegNo=2`
+      console.log('body', encodeFormData({
+        SessionId: sessionId,
+        RoomNo: '1',
+        ReserveDate: date,
+        SegNo: '2',
+      }));
       $httpClient.post(
         {
           url: 'https://wgzx.gass.cn:18083/home/FetchPreMenu',
