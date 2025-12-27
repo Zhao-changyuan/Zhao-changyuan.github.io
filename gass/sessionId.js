@@ -319,7 +319,7 @@ function getRandom() {
 
 const LOG_PREFIX = '[gass-sessionId]'
 function log(message) {
-  console.log(`${LOG_PREFIX} ${message}`)
+  $notification.post(LOG_PREFIX, message, '')
 }
 
 ;(() => {
