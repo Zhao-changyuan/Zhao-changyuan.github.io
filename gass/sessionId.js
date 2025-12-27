@@ -323,6 +323,8 @@ function getRandom() {
   if (url === LOGIN_URL) {
     const res = JSON.parse($response.body)
 
+      $notification.post(`res`, $response.body)
+
     const { session: sessionId } = res.data
     if (sessionId) {
       const today = getToday()
