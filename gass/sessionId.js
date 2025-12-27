@@ -1,5 +1,5 @@
 // 登录接口 test
-const LOGIN_URL = 'https://wgzx.gass.cn/wxopen/OnLogin'
+const LOGIN_URL = 'https://wgzx.gass.cn/wxopen/CodeSession'
 
 // 全局变量
 const GLOBAL_VALUES = {
@@ -322,7 +322,7 @@ function getRandom() {
   if (url === LOGIN_URL) {
     const res = JSON.parse($response.body)
 
-    const { sessionId } = res
+    const { session: sessionId } = res.data
     if (sessionId) {
       const today = getToday()
 
