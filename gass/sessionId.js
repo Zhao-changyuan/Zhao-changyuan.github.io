@@ -317,51 +317,82 @@ function getRandom() {
 
 
 
+const LOG_PREFIX = '[gass-sessionId]'
+function log(message) {
+  console.log(`${LOG_PREFIX} ${message}`)
+}
+
 ;(() => {
-  const url = $request.url
+  const url = $request && $request.url ? $request.url : ''
+  if (!url) {
+    log('缺少$request.url，脚本可能未在http-response上下文执行')
+    $done({})
+    return
+  }
 
-      $notification.post(`url`, url)
-  if (url === LOGIN_URL) {
-    const res = JSON.parse($response.body)
+  const isLogin = url.indexOf('/wxopen/CodeSession') > -1
+  log(`url=${url} | isLogin=${isLogin}`)
 
-      $notification.post(`res`, $response.body)
-
-    const { session: sessionId } = res.data
-    if (sessionId) {
-      const today = getToday()
-
-      storeValue(GLOBAL_VALUES.SESSION_ID_KEY, sessionId)
-      storeValue(GLOBAL_VALUES.SESSION_ID_DATE_KEY, today)
-      $notification.post(`${today}已登录`, sessionId, sessionId)
-
-      const curWeekLastWorkday = getCurWeekLastWorkday()
-      storeValue(GLOBAL_VALUES.CUR_WORK_LAST_WORKDAY, curWeekLastWorkday || '')
-
-
-      const workdays = getNextWeekWorkdays()
-      storeValue(GLOBAL_VALUES.WORK_DAYS_KEY, JSON.stringify(workdays))
-
-      // const curWorkdays = getCurWeekWorkdays()
-      // storeValue(GLOBAL_VALUES.CUR_WORK_DAYS_KEY, JSON.stringify(curWorkdays))
-
-      Promise.all([fetchIndex(sessionId), fetchOrderQueryAcc(sessionId)])
-        .then(([res1, res2, res3]) => {
-          // $notification.post('Goods', `数量：${res3.length}`, `下周工作日：${readValue(GLOBAL_VALUES.WORK_DAYS_KEY)}`)
-        })
-        .finally(() => {
-          $done({})
-        })
+  if (isLogin) {
+    const body = $response && $response.body ? $response.body : ''
+    if (!body) {
+      log('登录响应body为空')
+      $done({})
+      return
     }
+
+    let res = null
+    try {
+      res = JSON.parse(body)
+    } catch (error) {
+      log(`登录响应JSON解析失败，body长度=${body.length}`)
+      $done({})
+      return
+    }
+
+    const sessionId =
+      (res && res.data && (res.data.session || res.data.sessionId)) ||
+      (res && (res.session || res.sessionId)) ||
+      ''
+
+    if (!sessionId) {
+      const retcode = res && (res.retcode !== undefined ? res.retcode : res.code)
+      log(`未获取到sessionId，retcode=${retcode}`)
+      $done({})
+      return
+    }
+
+    const today = getToday()
+
+    storeValue(GLOBAL_VALUES.SESSION_ID_KEY, sessionId)
+    storeValue(GLOBAL_VALUES.SESSION_ID_DATE_KEY, today)
+    $notification.post(`${today}已登录`, sessionId, sessionId)
+
+    const curWeekLastWorkday = getCurWeekLastWorkday()
+    storeValue(GLOBAL_VALUES.CUR_WORK_LAST_WORKDAY, curWeekLastWorkday || '')
+
+    const workdays = getNextWeekWorkdays()
+    storeValue(GLOBAL_VALUES.WORK_DAYS_KEY, JSON.stringify(workdays))
+
+    // const curWorkdays = getCurWeekWorkdays()
+    // storeValue(GLOBAL_VALUES.CUR_WORK_DAYS_KEY, JSON.stringify(curWorkdays))
+
+    Promise.all([fetchIndex(sessionId), fetchOrderQueryAcc(sessionId)])
+      .then(([res1, res2, res3]) => {
+        // $notification.post('Goods', `数量：${res3.length}`, `下周工作日：${readValue(GLOBAL_VALUES.WORK_DAYS_KEY)}`)
+      })
+      .finally(() => {
+        $done({})
+      })
   } else {
     storeValue(GLOBAL_VALUES.CUR_WORK_DAYS_KEY, '')
 
     const curWeekLastWorkday = getCurWeekLastWorkday()
     storeValue(GLOBAL_VALUES.CUR_WORK_LAST_WORKDAY, curWeekLastWorkday || '')
-    console.log('cur work last workday:', readValue(GLOBAL_VALUES.CUR_WORK_LAST_WORKDAY));
+    console.log('cur work last workday:', readValue(GLOBAL_VALUES.CUR_WORK_LAST_WORKDAY))
     // console.log('cur workdays:', readValue(GLOBAL_VALUES.CUR_WORK_DAYS_KEY));
-    console.log('next workdays', readValue(GLOBAL_VALUES.WORK_DAYS_KEY));
-    console.log('sessionId', readValue(GLOBAL_VALUES.SESSION_ID_KEY), readValue(GLOBAL_VALUES.SESSION_ID_DATE_KEY));
+    console.log('next workdays', readValue(GLOBAL_VALUES.WORK_DAYS_KEY))
+    console.log('sessionId', readValue(GLOBAL_VALUES.SESSION_ID_KEY), readValue(GLOBAL_VALUES.SESSION_ID_DATE_KEY))
     $done({})
-    
   }
 })()
