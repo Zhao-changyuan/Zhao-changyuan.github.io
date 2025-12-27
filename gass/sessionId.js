@@ -320,6 +320,7 @@ function getRandom() {
 ;(() => {
   const url = $request.url
 
+      $notification.post(`url`, url)
   if (url === LOGIN_URL) {
     const res = JSON.parse($response.body)
 
