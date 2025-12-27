@@ -1,5 +1,5 @@
 // 登录接口 test
-const LOGIN_URL = 'https://wgzx.gass.cn/wxopen/CodeSession'
+const LOGIN_URL = 'https://wgzx.gass.cn:18085/wxopen/CodeSession'
 
 // 全局变量
 const GLOBAL_VALUES = {
@@ -242,7 +242,7 @@ function fetchIndex(sessionId) {
   return new Promise((resolve, reject) => {
     $httpClient.get(
       {
-        url: `https://wgzx.gass.cn:18085/?sessionid=${sessionId}`,
+        url: `https://wgzx.gass.cn:18083/?sessionid=${sessionId}`,
       },
       (err, response, body) => {
         if (err) {
@@ -265,14 +265,15 @@ function fetchOrderQueryAcc(sessionId) {
   return new Promise((resolve, reject) => {
     $httpClient.post(
       {
-        url: `https://wgzx.gass.cn:18085/order/QueryAcc`,
+        url: `https://wgzx.gass.cn:18083/order/QueryAcc`,
         headers: {
           Accept: 'application/json, text/plain, */*',
           'Content-Type': 'application/x-www-form-urlencoded',
         },
         // body: `SessionId=${sessionId}`,
         body: encodeFormData({
-          SessionId: sessionId
+          SessionId: sessionId,
+          // NeedWallet: true,
         }),
       },
       (err, response, body) => {
@@ -328,7 +329,7 @@ function getRandom() {
 
       storeValue(GLOBAL_VALUES.SESSION_ID_KEY, sessionId)
       storeValue(GLOBAL_VALUES.SESSION_ID_DATE_KEY, today)
-      // $notification.post(`${today}已登录`, sessionId, sessionId)
+      $notification.post(`${today}已登录`, sessionId, sessionId)
 
       const curWeekLastWorkday = getCurWeekLastWorkday()
       storeValue(GLOBAL_VALUES.CUR_WORK_LAST_WORKDAY, curWeekLastWorkday || '')
